@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -17,8 +17,10 @@ protocol.registerSchemesAsPrivileged([
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1050,
+    height: 700,
+    // frame: false,
+    resizable: false,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -87,3 +89,13 @@ if (isDevelopment) {
     })
   }
 }
+
+ipcMain.handle('synchronous-message', (event, name) => {
+  if (name === 'login') {
+    console.log('win', name)
+    win.setSize(340, 720)
+  } else {
+    console.log('win!', name)
+    win.setSize(1050, 700)
+  }
+})

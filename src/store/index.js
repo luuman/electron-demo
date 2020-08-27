@@ -1,12 +1,10 @@
-import { createStore } from 'vuex'
+import Vuex from 'vuex'
+import modules from './modules'
+import getters from './getters'
 
-export default createStore({
-  state: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
-  modules: {
-  }
+const createStore = new Vuex.Store({
+  modules,
+  getters
 })
+// console.log(createStore.state.user.token)
+export default createStore
