@@ -13,7 +13,14 @@ let win
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
+console.log(process.env.ELECTRON_NODE_INTEGRATION)
 
+const gotSingleLock = app.requestSingleInstanceLock()
+if (!gotSingleLock) {
+  app.quit()
+} else {
+}
+// app.setAsDefaultProtocolClient('myapp', )
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
@@ -99,3 +106,7 @@ ipcMain.handle('synchronous-message', (event, name) => {
     win.setSize(1050, 700)
   }
 })
+
+function openFile() {
+  
+}

@@ -3,8 +3,8 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import isElectron from 'is-electron'
-import { ipcRenderer } from 'electron'
-// import { ipcRenderer, shell } from 'electron'
+// import { ipcRenderer } from 'electron'
+import { ipcRenderer, shell } from 'electron'
 
 import Mock from './mock/index'
 console.log(process.env)
@@ -51,6 +51,7 @@ function reSetSize(name = '') {
 
 // shell启动浏览器
 // shell.openExternal('http://www.google.com')
+shell.openPath('/Users/luuman/Downloads/Debit & Credit 2.7.2[macdo.cn].dmg')
 
 // ipcRenderer.invoke('app-child', 'name')
 
@@ -80,7 +81,7 @@ const name = ['BaiduNetdisk_mac', 'QQ', '']
 console.log(name)
 
 const { spawn, exec } = require('child_process')
-const log = spawn('osascript', ['-e', 'id of application \"BaiduNetdisk_mac\"'])
+const log = spawn('osascript', ['-e', 'id of application \"Motrix\"'])
 // const log = spawn('osascript', ['-e', 'id of application \"应用名字\"'])
 let buffer = ''
 log.stdout.on('data', (data) => {
@@ -89,7 +90,7 @@ log.stdout.on('data', (data) => {
 log.stdout.on('end', () => {
 	console.log(buffer)
 	if (buffer) {
-		exec('open -a "BaiduNetdisk_mac.app"', (error, stdout, stderr) => {
+		exec('open -a "Motrix.app"', (error, stdout, stderr) => {
 			console.log(error, stdout, stderr)
 		})
 		// spawn('osascript', ['-e', ])
