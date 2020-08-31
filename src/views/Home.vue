@@ -1,8 +1,9 @@
 <template>
   <div class="home">
-    <div @click="download" v-show="!downIs">下载资源</div>
+    <div @click="download" v-show="!downIs && appIsShow">下载资源</div>
     <div v-show="downIs">开始下载</div>
     <div v-show="appIsShow">APP 未安装</div>
+    <div v-show="!appIsShow">APP 已安装</div>
     <div v-show="downIs">{{ parseFloat((arg * 100).toFixed(2)) }}%</div>
     <div v-show="filePath">文件下载地址：{{filePath}}</div>
     <proBar :numBase="arg"></proBar>
@@ -33,7 +34,7 @@ export default {
     }
   },
   mounted () {
-    // this.appIs()
+    this.appIs()
   },
   methods: {
     // app是否安装
@@ -65,7 +66,7 @@ export default {
       ipcRenderer.on('download-finish', (event, filePath) => {
         this.appIsDone = setInterval(() => {
           this.appIs()
-        }, 1000)
+        }, 2000)
         this.filePath = filePath
       })
     }
