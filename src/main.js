@@ -7,7 +7,7 @@ import isElectron from 'is-electron'
 import { ipcRenderer, shell } from 'electron'
 
 import Mock from './mock/index'
-console.log(process.env)
+console.log(global.launcher)
 if (process.env.NODE_ENV === 'development') {
 	Mock.init()
 }
@@ -19,7 +19,7 @@ let sizeName = ''
 router.beforeEach((to, from, next) => {
 	// console.log(store.getters.token, to, from, next)
 	if (store.getters.token) {
-		reSetSize()
+		// reSetSize()
 		next()
 	} else {
 		if (whiteList.indexOf(to.path) !== -1) {

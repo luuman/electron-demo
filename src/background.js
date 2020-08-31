@@ -1,6 +1,6 @@
 'use strict'
-
-import { app, protocol, BrowserWindow, ipcMain } from 'electron'
+import Launcher from '@/main/Launcher'
+import { app, protocol, BrowserWindow, ipcMain, dialog } from "electron";
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -80,6 +80,7 @@ app.on('ready', async () => {
     }
   }
   createWindow()
+  // openFile()
 })
 
 // Exit cleanly on request from parent process in development mode.
@@ -106,7 +107,53 @@ ipcMain.handle('synchronous-message', (event, name) => {
     win.setSize(1050, 700)
   }
 })
+ipcMain.on('download', (event, fileUrl) => {
+  const path = require('path')
+  win.webContents.session.on('will-download', (e, item) => {
+    // 获取文件的总大小
+    const totalBytes = item.getTotalBytes()
+    let fileBase = 0
+    // 设置文件的保存路径，此时默认弹出的 save dialog 将被覆盖
+    const filePath = path.join(app.getPath('downloads'), item.getFilename())
+    item.setSavePath(filePath)
+    // 监听下载过程，计算并设置进度条进度
+    item.on('updated', () => {
+      let baifenb = item.getReceivedBytes() / totalBytes
+      // if (fileBase !== baifenb) {
+      //   fileBase = baifenb
+      //   win.setProgressBar(baifenb)
+      //   event.reply('download-reply', baifenb, baifenb)
+      // }
+      win.setProgressBar(baifenb)
+      event.reply('download-reply', baifenb, baifenb)
+    })
+    // 监听下载结束事件
+    item.on('done', (e, state) => {
+      // 如果窗口还在的话，去掉进度条
+      if (!win.isDestroyed()) {
+        win.setProgressBar(-1)
+      }
+      // 下载被取消或中断了
+      if (state === 'interrupted') {
+        dialog.showErrorBox(
+          '下载失败',
+          `文件 ${item.getFilename()} 因为某些原因被中断下载`
+        )
+      }
+      // 下载完成，让 dock 上的下载目录Q弹一下下
+      if (state === 'completed') {
+        app.dock.downloadFinished(filePath)
+      }
+    })
+  })
 
-function openFile() {
-  
-}
+  // const path = require('path')
+  // win.webContents.session.on('will-download', (event, item, webContents) => {
+  //   const filePath = path.join(app.getPath('downloads'), item.getFilename())
+  //   item.setSavePath(filePath)
+  // })
+  win.webContents.downloadURL(fileUrl)
+})
+
+global.launcher = new Launcher()
+console.log(global.launcher)
