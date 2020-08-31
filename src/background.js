@@ -1,6 +1,6 @@
 'use strict'
 import Launcher from '@/main/Launcher'
-import { app, protocol, BrowserWindow, ipcMain, dialog } from "electron";
+import { app, protocol, BrowserWindow, ipcMain, dialog, shell } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -24,8 +24,10 @@ if (!gotSingleLock) {
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 1050,
-    height: 700,
+    // width: 1050,
+    // height: 700,
+    width: 340,
+    height: 720,
     // frame: false,
     resizable: false,
     webPreferences: {
@@ -100,13 +102,12 @@ if (isDevelopment) {
 
 ipcMain.handle('synchronous-message', (event, name) => {
   if (name === 'login') {
-    console.log('win', name)
     win.setSize(340, 720)
   } else {
-    console.log('win!', name)
     win.setSize(1050, 700)
   }
 })
+// 启动下载
 ipcMain.on('download', (event, fileUrl) => {
   const path = require('path')
   win.webContents.session.on('will-download', (e, item) => {
@@ -115,17 +116,16 @@ ipcMain.on('download', (event, fileUrl) => {
     let fileBase = 0
     // 设置文件的保存路径，此时默认弹出的 save dialog 将被覆盖
     const filePath = path.join(app.getPath('downloads'), item.getFilename())
+    console.log(filePath)
     item.setSavePath(filePath)
     // 监听下载过程，计算并设置进度条进度
     item.on('updated', () => {
       let baifenb = item.getReceivedBytes() / totalBytes
-      // if (fileBase !== baifenb) {
-      //   fileBase = baifenb
-      //   win.setProgressBar(baifenb)
-      //   event.reply('download-reply', baifenb, baifenb)
-      // }
-      win.setProgressBar(baifenb)
-      event.reply('download-reply', baifenb, baifenb)
+      if (fileBase !== baifenb) {
+        fileBase = baifenb
+        win.setProgressBar(baifenb)
+        event.reply('download-reply', baifenb, baifenb)
+      }
     })
     // 监听下载结束事件
     item.on('done', (e, state) => {
@@ -143,6 +143,13 @@ ipcMain.on('download', (event, fileUrl) => {
       // 下载完成，让 dock 上的下载目录Q弹一下下
       if (state === 'completed') {
         app.dock.downloadFinished(filePath)
+        // shell启动浏览器
+        // shell.openExternal('http://www.google.com')
+        // ipcRenderer.invoke('app-child', 'name')
+        shell.openPath(filePath).then(res => {
+          console.log('解压完毕')
+          event.reply('download-finish', filePath)
+        })
       }
     })
   })
@@ -153,6 +160,31 @@ ipcMain.on('download', (event, fileUrl) => {
   //   item.setSavePath(filePath)
   // })
   win.webContents.downloadURL(fileUrl)
+})
+const { spawn, exec } = require('child_process')
+// 打开应用
+ipcMain.on('openApp', (event, fileUrl) => {
+  exec('open -a "Motrix.app"', (error, stdout, stderr) => {
+    console.log(error, stdout, stderr)
+  })
+})
+// 是否安装
+ipcMain.on('appIs', (event, appName) => {
+  const log = spawn('osascript', ['-e', `id of application \"${appName}\"`])
+  // const log = spawn('osascript', ['-e', 'id of application \"应用名字\"'])
+  let buffer = ''
+  log.stdout.on('data', (data) => {
+    buffer += data
+  })
+  log.stdout.on('end', () => {
+    console.log(buffer)
+    event.reply('appIs-finish', buffer)
+  })
+  log.stderr.on('data', (err) => {
+    console.log('err', err)
+  })
+  log.stderr.on('end', () => {
+  })
 })
 
 global.launcher = new Launcher()

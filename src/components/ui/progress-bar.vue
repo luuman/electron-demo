@@ -1,10 +1,10 @@
 <template>
   <section class="container">
-    <div>{{numBase}}</div>
-    <div class="li" v-for="(item, index) in List" :key="item">
+    <!-- <div>{{numBase}} {{checkNum}}</div> -->
+    <!-- <div class="li" v-for="(item, index) in List" :key="item">
       <input type="radio" class="radio" name="progress" :value="item" :id="item" :checked="checkNum === item">
-      <label :for="item" class="label" @click="checkNum = item">{{index}}%</label>
-    </div>
+      <label :for="item" class="label" @click="tabCheck">{{index}}%</label>
+    </div> -->
     <div class="progress" :class="checkNum">
       <div class="progress-bar" :style="`${numBase === 0 ? '' : 'width: ' + numBase * 100 + '%'}`"></div>
     </div>
@@ -23,12 +23,12 @@
           if (item < value * 100) name = this.List[item]
           else return false
         })
-        this.checkNum = name
+        this.checkNum = name || 'five'
       }
     },
     data () {
       return {
-        checkNum: 'five',
+        checkNum: '',
         List: {
           5: 'five',
           25: 'twentyfive',
@@ -36,6 +36,12 @@
           75: 'seventyfive',
           100: 'onehundred'
         }
+      }
+    },
+    methods: {
+      tabCheck (item) {
+        console.log(item)
+        this.checkNum = item
       }
     },
     mounted () {
@@ -48,13 +54,12 @@
   display: inline;
 }
 .container {
-  background: #2a2a2a url("../../assets/image/bg.png") 0 0 repeat;
   margin: 80px auto;
-  width: 640px;
+  // width: 640px;
   text-align: center;
   .progress {
     margin: 0 auto;
-    width: 400px;
+    // width: 400px;
   }
 }
 
