@@ -3,10 +3,11 @@ import Launcher from '@/main/Launcher'
 import { app, protocol, BrowserWindow, ipcMain, dialog, shell } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
-import path from 'path'
+// import path from 'path'
+const extract = require('extract-zip')
 // import unzip from 'unzip'
 const isDevelopment = process.env.NODE_ENV !== 'production'
-process.noAsar = true
+// process.noAsar = true
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
@@ -110,7 +111,7 @@ ipcMain.handle('synchronous-message', (event, name) => {
   }
 })
 // 启动下载
-ipcMain.on('download', (event, fileUrl) => {
+ipcMain.on('download', (event, fileUrl, desPath) => {
   try {
     console.log('download fly')
     const path = require('path')
@@ -148,15 +149,21 @@ ipcMain.on('download', (event, fileUrl) => {
           // shell启动浏览器
           // shell.openExternal('http://www.google.com')
           // ipcRenderer.invoke('app-child', 'name')
-          shell.openPath(filePath).then(res => {
-            console.log('解压完毕')
-            event.reply('download-finish', filePath)
+          // shell.openPath(filePath).then(res => {
+          //   console.log('解压完毕')
+          //   event.reply('download-finish', filePath)
+          // })
+          console.log('filePath', filePath)
+          extract(filePath, { dir: path.join(desPath, '') }).then(res => {
+            event.reply('download-finish', filePath, res)
+          }).catch(err => {
+            console.log('extractFile-err: ', err)
           })
         }
       })
     })
 
-    // const path = require('path')
+    // 
     // win.webContents.session.on('will-download', (event, item, webContents) => {
     //   const filePath = path.join(app.getPath('downloads'), item.getFilename())
     //   item.setSavePath(filePath)
@@ -191,146 +198,12 @@ ipcMain.on('appIs', (event, appName) => {
   log.stderr.on('end', () => {
   })
 })
+// 解压
 ipcMain.on('extractFile', (event, filePath, desPath) => {
-  const extract = require('extract-zip')
+  
   // const fs = require('fs')
-  try {
-    extract(filePath, { dir: path.join(desPath, 'extractFile') }, err => {
-      if (err) console.log('extractFile err: ', err)
-      // fs.writeFile(path.join(desPath, 'path.txt'), 'Electron.app/Contents/MacOS/Electron', err => {
-      //   if (err) console.log('extractFile err: ', err)
-      //   console.log('extractFile')
-      // })
-    })
-  } catch (error) {
-    console.log('catch : ', error)
-  }
-})
-
-ipcMain.on('compressing', (event, filePath, desPath) => {
-  console.log('compressing')
-  const compressing = require('compressing')
-  // 解压缩
-  compressing.zip.uncompress(filePath, desPath)
-    .then(() => {
-      console.log('success')
-    })
-    .catch(err => {
-      console.error(err)
-    })
-})
- 
-ipcMain.on('DecompressZip', (event, filePath, desPath) => {
-  console.log('DecompressZip')
-  var DecompressZip = require('decompress-zip')
-  var unzipper = new DecompressZip(filePath)
-  // Add the error event listener
-  unzipper.on('error', function (err) {
-    console.log('Caught an error', err)
-  })
-
-  // Notify when everything is extracted
-  unzipper.on('extract', function (log) {
-    console.log('Finished extracting', log)
-  })
-
-  // Notify "progress" of the decompressed files
-  unzipper.on('progress', function (fileIndex, fileCount) {
-    console.log('Extracted file ' + (fileIndex + 1) + ' of ' + fileCount)
-  })
-  unzipper.extract({
-    path: desPath,
-    // You can filter the files that you want to unpack using the filter option
-    filter: function (file) {
-        console.log(file)
-        return file.type !== 'SymbolicLink'
-    }
-  })
-})
-
-ipcMain.on('unzip', (event, filePath, desPath) => {
-  console.log('unzip')
-})
-
-ipcMain.on('AdmZip', (event, filePath, desPath) => {
-  console.log('AdmZip')
-  var AdmZip = require('adm-zip')
-  const unzipper = new AdmZip(filePath)
-  unzipper.extractAllTo(desPath, true)
-  console.log('app.asar.unpacked.zip 解压缩完成')
-  console.log('unzipper.Extract({path: route}')
-})
-
-ipcMain.on('StreamZip', (event, filePath, desPath) => {
-  // invalid or unsupported zip format 不支持的格式
-  console.log('StreamZip')
-  const StreamZip = require('node-stream-zip')
-  const zip = new StreamZip({
-    file: filePath
-  })
-  zip.on('ready', () => {
-    console.log('Entries read: ' + zip.entriesCount);
-    for (const entry of Object.values(zip.entries())) {
-        const desc = entry.isDirectory ? 'directory' : `${entry.size} bytes`;
-        console.log(`Entry ${entry.name}: ${desc}`);
-    }
-    //读取完毕，记得关闭文件
-    zip.close()
-  });
-  // 报错提示
-  zip.on('error', err => {
-    console.log('unzip err：', err)
-  })
-})
-  // console.log(args, agd)
-  // const unzip = require('./unzip')
-  // var StreamZip = require('node-stream-zip');
-  // exec('ls -a', (error, stdout, stderr) => {
-  //   console.log(error, stdout, stderr)
-  // })
-  // var unzipper = new StreamZip({
-  //   file: args
-  // , storeEntries: true
-  // });
-  // console.log(unzipper)
-  // // unzipper.on('error', function (err) { console.error('[ERROR]', err); })
-  // unzipper.on("error", (err) => {
-  //   console.log("Unable to unzip the file " + args, err);
-  //   // return reject(err);
-  // });
-//   
-
-//   
- 
-// unzipper.list();
-
-// packing a directory
-// tar.pack('./my-directory').pipe(fs.createWriteStream('my-tarball.tar'))
-
-// extracting a directory
   
-  // fs.createReadStream(args).pipe(unzipper.Parse())
-    // .on('entry', function (entry) {
-    //   const fileName = entry.path;
-    //   const type = entry.type; // 'Directory' or 'File'
-    //   const size = entry.vars.uncompressedSize; // There is also compressedSize;
-    //   if (fileName === "this IS the file I'm looking for") {
-    //     entry.pipe(fs.createWriteStream('output/path'));
-    //   } else {
-    //     entry.autodrain();
-    //   }
-    // })
-  
-    // try {
-  //   let extract = unzip.Extract({ path: './' });
-  //   console.log(extract)
-  // } catch (error) {
-  //   console.log(error)
-  // }
-  
-  // 
-//   // fs.createReadStream(args).pipe(unzip.Extract({ path: 'output/path' }))
-// })
+})
 
 global.launcher = new Launcher()
 console.log(global.launcher)
