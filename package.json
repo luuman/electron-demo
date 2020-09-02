@@ -17,6 +17,8 @@
   "dependencies": {
     "chai-as-promised": "^7.1.1",
     "core-js": "^3.6.5",
+    "tar-fs": "^2.1.0",
+    "unzip": "^0.1.11",
     "vue": "^3.0.0-0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
@@ -32,10 +34,14 @@
     "@vue/compiler-sfc": "^3.0.0-0",
     "@vue/eslint-config-standard": "^5.1.2",
     "@vue/test-utils": "^2.0.0-0",
+    "adm-zip": "^0.4.16",
     "axios-mock-adapter": "^1.18.2",
     "babel-eslint": "^10.1.0",
     "chai": "^4.1.2",
     "chromedriver": "84",
+    "compressing": "^1.5.1",
+    "cross-zip": "^3.1.0",
+    "decompress-zip": "^0.2.2",
     "electron": "^9.0.0",
     "electron-devtools-installer": "^3.1.0",
     "eslint": "^6.7.2",
@@ -48,8 +54,10 @@
     "js-cookie": "^2.2.1",
     "mockjs": "^1.1.0",
     "node-sass": "^4.12.0",
+    "node-stream-zip": "^1.11.3",
     "sass-loader": "^8.0.2",
     "spectron": "^11.0.0",
+    "unzipper": "^0.10.11",
     "vue-cli-plugin-electron-builder": "~2.0.0-rc.4"
   }
 }
