@@ -3,6 +3,7 @@ import Launcher from '@/main/Launcher'
 import { app, protocol, BrowserWindow, ipcMain, dialog, shell } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import is from 'electron-is'
 // import path from 'path'
 const extract = require('extract-zip')
 // import unzip from 'unzip'
@@ -180,23 +181,23 @@ ipcMain.on('openApp', (event, appName) => {
     console.log(error, stdout, stderr)
   })
 })
+console.log('<==========')
+console.log('macOS: ', is.macOS())
+console.log('osx: ', is.osx())
+console.log('windows: ', is.windows())
+console.log('main: ', is.main())
+console.log('==========>')
 // 是否安装
 ipcMain.on('appIs', (event, appName) => {
-  const log = spawn('osascript', ['-e', `id of application \"${appName}\"`])
-  // const log = spawn('osascript', ['-e', 'id of application \"应用名字\"'])
-  let buffer = ''
-  log.stdout.on('data', (data) => {
-    buffer += data
-  })
-  log.stdout.on('end', () => {
-    console.log(buffer)
-    event.reply('appIs-finish', buffer)
-  })
-  log.stderr.on('data', (err) => {
-    console.log('err', err)
-  })
-  log.stderr.on('end', () => {
-  })
+  if (is.macOS()) {
+    isInstallMac(appName).then(res => {
+      event.reply('appIs-finish', res)
+    }).catch(err => console.log(err))
+  } else if (is.windows()) {
+    exec(`reg query HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\| find / i "${appName}"`, (error, stdout, stderr) => {
+      console.log(error, stdout, stderr)
+    })
+  }
 })
 // 解压
 ipcMain.on('extractFile', (event, filePath, desPath) => {
@@ -207,3 +208,27 @@ ipcMain.on('extractFile', (event, filePath, desPath) => {
 
 global.launcher = new Launcher()
 console.log(global.launcher)
+
+function isInstallMac(appName) {
+  return new Promise((resolve, reject) => {
+    let buffer = ''
+    const appCmd = spawn('osascript', ['-e', `id of application \"${appName}\"`])
+    appCmd.stdout.on('data', (data) => {
+      buffer += data
+    })
+    appCmd.stdout.on('end', () => {
+      resolve(buffer)
+    })
+    appCmd.stderr.on('data', (err) => {
+      reject(err)
+    })
+    appCmd.stderr.on('end', () => {
+    })
+  })
+}
+// function isInstallWin() {
+//   return new Promise((resolve, reject) => {
+//     reg query HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\| find / i "应用(可能会是一个hash)"
+
+//   })
+// }
