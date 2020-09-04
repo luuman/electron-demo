@@ -119,7 +119,7 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
       const totalBytes = item.getTotalBytes()
       let fileBase = 0
       // 设置文件的保存路径，此时默认弹出的 save dialog 将被覆盖
-      const filePath = path.join(path.join(__dirname, 'downloads'), item.getFilename())
+      const filePath = path.join(path.join(app.getPath('downloads'), 'downloads'), item.getFilename())
       console.log(filePath)
       item.setSavePath(filePath)
       // 监听下载过程，计算并设置进度条进度
@@ -144,7 +144,19 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
         }
         // 下载完成，让 dock 上的下载目录Q弹一下下
         if (state === 'completed') {
-          app.dock.downloadFinished(filePath)
+          console.log('filePath', filePath)
+          if (is.macOS()) {
+            app.dock.downloadFinished(filePath)
+            extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
+              event.reply('download-finish', filePath, res)
+            }).catch(err => {
+              console.log('extractFile-err: ', err)
+            })
+          } else if (is.windows()) {
+            exec(`start "${filePath}"`, (error, stdout, stderr) => {
+              console.log(error, stdout, stderr)
+            })
+          }
           // shell启动浏览器
           // shell.openExternal('http://www.google.com')
           // ipcRenderer.invoke('app-child', 'name')
@@ -152,12 +164,6 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
           //   console.log('解压完毕')
           //   event.reply('download-finish', filePath)
           // })
-          console.log('filePath', filePath)
-          extract(filePath, { dir: path.join(desPath, '') }).then(res => {
-            event.reply('download-finish', filePath, res)
-          }).catch(err => {
-            console.log('extractFile-err: ', err)
-          })
         }
       })
     })
@@ -179,12 +185,12 @@ ipcMain.on('openApp', (event, appName) => {
     console.log(error, stdout, stderr)
   })
 })
-console.log('<==========')
-console.log('macOS: ', is.macOS())
-console.log('osx: ', is.osx())
-console.log('windows: ', is.windows())
-console.log('main: ', is.main())
-console.log('==========>')
+// console.log('<==========')
+// console.log('macOS: ', is.macOS())
+// console.log('osx: ', is.osx())
+// console.log('windows: ', is.windows())
+// console.log('main: ', is.main())
+// console.log('==========>')
 // 是否安装
 ipcMain.on('appIs', (event, appName) => {
   if (is.macOS()) {
