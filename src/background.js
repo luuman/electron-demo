@@ -4,9 +4,8 @@ import { app, protocol, BrowserWindow, ipcMain, dialog, shell } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import is from 'electron-is'
-// import path from 'path'
+import path from 'path'
 const extract = require('extract-zip')
-// import unzip from 'unzip'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 // process.noAsar = true
 // Keep a global reference of the window object, if you don't, the window will
@@ -115,13 +114,12 @@ ipcMain.handle('synchronous-message', (event, name) => {
 ipcMain.on('download', (event, fileUrl, desPath) => {
   try {
     console.log('download fly')
-    const path = require('path')
     win.webContents.session.on('will-download', (e, item) => {
       // 获取文件的总大小
       const totalBytes = item.getTotalBytes()
       let fileBase = 0
       // 设置文件的保存路径，此时默认弹出的 save dialog 将被覆盖
-      const filePath = path.join(app.getPath('downloads'), item.getFilename())
+      const filePath = path.join(path.join(__dirname, 'downloads'), item.getFilename())
       console.log(filePath)
       item.setSavePath(filePath)
       // 监听下载过程，计算并设置进度条进度
@@ -191,6 +189,7 @@ console.log('==========>')
 ipcMain.on('appIs', (event, appName) => {
   if (is.macOS()) {
     isInstallMac(appName).then(res => {
+      console.log('appIs-finish')
       event.reply('appIs-finish', res)
     }).catch(err => console.log(err))
   } else if (is.windows()) {
@@ -201,14 +200,17 @@ ipcMain.on('appIs', (event, appName) => {
 })
 // 解压
 ipcMain.on('extractFile', (event, filePath, desPath) => {
-  
   // const fs = require('fs')
-  
 })
 
 global.launcher = new Launcher()
 console.log(global.launcher)
-
+// 下载资源
+// function isInstallMac(appName) {
+//   return new Promise((resolve, reject) => {
+//   })
+// }
+// MacApp是否安装
 function isInstallMac(appName) {
   return new Promise((resolve, reject) => {
     let buffer = ''
@@ -217,6 +219,7 @@ function isInstallMac(appName) {
       buffer += data
     })
     appCmd.stdout.on('end', () => {
+      console.log(buffer)
       resolve(buffer)
     })
     appCmd.stderr.on('data', (err) => {
@@ -226,6 +229,12 @@ function isInstallMac(appName) {
     })
   })
 }
+
+const { restartApp } = require('@/main/cmd/start.js')
+ipcMain.on('restartApp', (event, appName) => {
+  console.log('restartApp')
+  restartApp()
+})
 // function isInstallWin() {
 //   return new Promise((resolve, reject) => {
 //     reg query HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\| find / i "应用(可能会是一个hash)"

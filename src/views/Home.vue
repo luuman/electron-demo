@@ -1,6 +1,9 @@
 <template>
   <div class="home">
-    <div @click="download" v-show="!downIs && appIsShow">下载资源</div>
+    <div @click="download('downloadUrl')" v-show="!downIs && appIsShow">下载资源Mac</div>
+    <div @click="download('exeDownUrl')" v-show="!downIs && appIsShow">下载资源win</div>
+    <div @click="download('exeDownUrlZip')" v-show="!downIs && appIsShow">下载资源winzip</div>
+    <div @click="restartApp">restartApp</div>
     <div v-show="downIs">{{apiCon.downName}} 开始下载</div>
     <div v-show="appIsShow">APP 未安装</div>
     <div v-show="!appIsShow">APP 已安装</div>
@@ -28,7 +31,7 @@ export default {
       zip: ['DecompressZip', 'unzip', 'AdmZip', 'StreamZip', 'compressing', 'extractFile'],
       arg: 0,
       downIs: false,
-      appIsShow: false,
+      appIsShow: '',
       appIsDone: '',
       // apiCon: {
       //   downloadUrl: 'https://github.com/agalwood/Motrix/releases/download/v1.5.15/Motrix-1.5.15-mac.zip',
@@ -49,12 +52,16 @@ export default {
     this.appIs()
   },
   methods: {
+    restartApp () {
+      ipcRenderer.send('restartApp', this.apiCon.downName)
+    },
     // app是否安装
     appIs () {
       console.log('appIs')
       ipcRenderer.send('appIs', this.apiCon.downName)
+      this.appIsShow = true
       ipcRenderer.on('appIs-finish', (event, buffer) => {
-        console.log(buffer)
+        console.log('buffer', buffer)
         if (buffer) {
           this.openApp(this.apiCon.downName)
           // clearInterval(this.appIsDone)
@@ -73,9 +80,9 @@ export default {
       ipcRenderer.send('openApp', appName)
     },
     // 下载
-    download () {
+    download (keys) {
       this.downIs = true
-      ipcRenderer.send('download', this.apiCon.downloadUrl, '/Users/luuman/Downloads')
+      ipcRenderer.send('download', this.apiCon[keys], '/Users/luuman/Downloads')
       ipcRenderer.on('download-reply', (event, arg) => {
         // console.time()
         this.arg = arg
