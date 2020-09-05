@@ -72,7 +72,7 @@ export default {
         },
         exeDownUrlZip: {
           url: '/ReworldLauncher.zip',
-          name: 'ReworldLauncher'
+          name: '重启世界'
         }
       },
       filePath: ''

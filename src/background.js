@@ -188,7 +188,7 @@ ipcMain.on('zip-open', (event, fileUrl, fileName) => {
       dir: path.join(app.getPath('downloads'), 'downloads'),
       onEntry: (item, index) => {
         console.log('onEntryitem', item.fileName)
-        item.fileName = item.fileName.replace('ΘçìσÉ»Σ╕ûτòî', '重启世界')
+        item.fileName = item.fileName.replace('╓╪╞⌠╩└╜τ', '重启世界')
       }
     }).then(res => {
       console.log('resdfdf', res)
@@ -198,10 +198,17 @@ ipcMain.on('zip-open', (event, fileUrl, fileName) => {
     })
   } else if (is.windows()) {
     let filePath = path.join(app.getPath('downloads'), 'downloads') + '/' + fileUrl
-    let openPaths = filePath.split('.')[0] + '/' + 'ReworldLauncher.exe'
+    let openPaths = filePath.split('.')[0] + '/' + '重启世界.exe'
     console.log(filePath, fileUrl, fileName)
     console.time()
-    extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
+    extract(filePath, {
+      dir: path.join(app.getPath('downloads'), 'downloads'),
+      onEntry: (item, index) => {
+        console.log('onEntryitem', item.fileName)
+        item.fileName = item.fileName.replace('╓╪╞⌠╩└╜τ', '重启世界')
+      }
+    }).then(res => {
+      console.log('resdfdf', res)
       shell.openPath(openPaths)
       console.timeEnd()
     }).catch(err => {
