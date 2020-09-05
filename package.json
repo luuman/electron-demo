@@ -17,8 +17,8 @@
   "dependencies": {
     "chai-as-promised": "^7.1.1",
     "core-js": "^3.6.5",
+    "iconv-lite": "^0.6.2",
     "tar-fs": "^2.1.0",
-    "unzip": "^0.1.11",
     "vue": "^3.0.0-0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"

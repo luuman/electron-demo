@@ -175,8 +175,7 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
     console.log(error)
   }
 })
-// const unzip = require('unzip')
-// console.log('unzip', unzip)
+var iconv = require('iconv-lite')
 
 ipcMain.on('zip-open', (event, fileUrl, fileName) => {
   if (is.macOS()) {
@@ -184,7 +183,9 @@ ipcMain.on('zip-open', (event, fileUrl, fileName) => {
     extract(filePath, {
       dir: path.join(app.getPath('downloads'), 'downloads'),
       onEntry: (item, index) => {
-        console.log('onEntryitem', item.fileName)
+        // console.log('onEntryitem', iconv.encode(item.fileName, 'CP437'))
+        // console.log('onEntryitem', iconv.decode(iconv.encode(item.fileName, 'CP437'), 'UTF-8'))
+        item.fileName = iconv.decode(iconv.encode(item.fileName, 'CP437'), 'UTF-8')
       }
     }).then(res => {
       openMacApp(fileName)
