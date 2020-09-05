@@ -162,7 +162,7 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
             // }).catch(err => {
             //   console.log('extractFile-err: ', err)
             // })
-            shell.openPath(openPaths)
+            shell.openPath(filePath)
             // exec(`start "${filePath}"`, (error, stdout, stderr) => {
             //   console.log(error, stdout, stderr)
             // })
@@ -176,17 +176,27 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
   }
 })
 ipcMain.on('zip-open', (event, fileUrl, fileName) => {
-  let filePath = path.join(app.getPath('downloads'), 'downloads') + fileUrl
-  console.log(filePath, fileUrl, fileName)
-  extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
-    if (is.macOS()) {
+  if (is.macOS()) {
+    let filePath = path.join(app.getPath('downloads'), 'downloads') + fileUrl
+    console.log(filePath, fileUrl, fileName)
+    extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
       openMacApp(fileName)
-    } else if (is.windows()) {
+    }).catch(err => {
+      console.log('extractFile-err: ', err)
+    })
+  } else if (is.windows()) {
+    let filePath = path.join(app.getPath('downloads'), 'downloads') + '/' + fileUrl
+    let openPaths = filePath.split('.')[0] + '/' + 'ReworldLauncher.exe'
+    console.log(filePath, fileUrl, fileName)
+    console.time()
+    extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
       shell.openPath(openPaths)
-    }
-  }).catch(err => {
-    console.log('extractFile-err: ', err)
-  })
+      console.timeEnd()
+    }).catch(err => {
+      console.log('extractFile-err: ', err)
+    })
+  }
+  
 })
 const { spawn, exec } = require('child_process')
 // 打开应用
@@ -209,9 +219,9 @@ ipcMain.on('appIs', (event, appName) => {
       event.reply('appIs-finish', res)
     }).catch(err => console.log(err))
   } else if (is.windows()) {
-    exec(`reg query HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\| find / i "${appName}"`, (error, stdout, stderr) => {
-      console.log(error, stdout, stderr)
-    })
+    // exec(`reg query HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\| find / i "${appName}"`, (error, stdout, stderr) => {
+    //   console.log(error, stdout, stderr)
+    // })
   }
 })
 // 解压
