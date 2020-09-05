@@ -54,7 +54,7 @@
   display: inline;
 }
 .container {
-  margin: 80px auto;
+  margin: 20px auto;
   // width: 640px;
   text-align: center;
   .progress {

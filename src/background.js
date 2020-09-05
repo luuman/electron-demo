@@ -111,8 +111,10 @@ ipcMain.handle('synchronous-message', (event, name) => {
   }
 })
 // 启动下载
+ipcMain.on('downloads', (event, fileUrl, desPath) => {
+  downloadFile(fileUrl, desPath)
+})
 ipcMain.on('download', (event, fileUrl, desPath) => {
-  // downloadFile(fileUrl, desPath)
   try {
     console.log('download fly')
     win.webContents.session.on('will-download', (e, item) => {
@@ -121,7 +123,8 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
       let fileBase = 0
       // 设置文件的保存路径，此时默认弹出的 save dialog 将被覆盖
       const filePath = path.join(path.join(app.getPath('downloads'), 'downloads'), item.getFilename())
-      console.log('filePath', filePath.split('.')[0] + 'ReworldLauncher.exe')
+      let openPaths = filePath.split('.')[0] + '/' + 'ReworldLauncher.exe'
+      console.log('filePath', openPaths)
       item.setSavePath(filePath)
       // 监听下载过程，计算并设置进度条进度
       item.on('updated', () => {
@@ -154,11 +157,12 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
               console.log('extractFile-err: ', err)
             })
           } else if (is.windows()) {
-            extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
-              shell.openPath(filePath.split('.')[0] + 'ReworldLauncher.exe')
-            }).catch(err => {
-              console.log('extractFile-err: ', err)
-            })
+            // extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
+            //   shell.openPath(openPaths)
+            // }).catch(err => {
+            //   console.log('extractFile-err: ', err)
+            // })
+            shell.openPath(openPaths)
             // exec(`start "${filePath}"`, (error, stdout, stderr) => {
             //   console.log(error, stdout, stderr)
             // })
@@ -170,6 +174,19 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
   } catch (error) {
     console.log(error)
   }
+})
+ipcMain.on('zip-open', (event, fileUrl, fileName) => {
+  let filePath = path.join(app.getPath('downloads'), 'downloads') + fileUrl
+  console.log(filePath, fileUrl, fileName)
+  extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
+    if (is.macOS()) {
+      openMacApp(fileName)
+    } else if (is.windows()) {
+      shell.openPath(openPaths)
+    }
+  }).catch(err => {
+    console.log('extractFile-err: ', err)
+  })
 })
 const { spawn, exec } = require('child_process')
 // 打开应用
