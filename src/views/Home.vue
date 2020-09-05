@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div @click="download('downloadUrl')" v-show="!downIs && appIsShow">下载资源Mac</div>
-    <div @click="download('exeDownUrl')" v-show="!downIs && appIsShow">下载资源win</div>
+    <!-- <div @click="download('exeDownUrl')" v-show="!downIs && appIsShow">下载资源win</div> -->
     <div @click="download('exeDownUrlZip')" v-show="!downIs && appIsShow">下载资源winzip</div>
     <div @click="restartApp">restartApp</div>
     <div v-show="downIs">{{apiCon.downName}} 开始下载</div>
@@ -41,7 +41,7 @@ export default {
       apiCon: {
         downloadUrl: 'https://github.com/michaelvillar/timer-app/releases/download/1.5.5/Timer.app.zip',
         exeDownUrl: 'https://apkstore.reworlder.com/Launcher/LaunchPlayer.exe',
-        exeDownUrlZip: 'http://cloud.reworldgame.com/seafhttp/files/c2d294a5-14af-4b20-99a4-7e4fbce33e97/ReworldLauncher.zip',
+        exeDownUrlZip: 'https://github.com/luuman/Index/releases/download/world/ReworldLauncher.zip',
         zipPath: '/Users/luuman/Downloads/Timer.app.zip',
         downName: 'Timer'
       },

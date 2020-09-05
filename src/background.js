@@ -112,6 +112,7 @@ ipcMain.handle('synchronous-message', (event, name) => {
 })
 // 启动下载
 ipcMain.on('download', (event, fileUrl, desPath) => {
+  // downloadFile(fileUrl, desPath)
   try {
     console.log('download fly')
     win.webContents.session.on('will-download', (e, item) => {
@@ -120,7 +121,7 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
       let fileBase = 0
       // 设置文件的保存路径，此时默认弹出的 save dialog 将被覆盖
       const filePath = path.join(path.join(app.getPath('downloads'), 'downloads'), item.getFilename())
-      console.log(filePath)
+      console.log('filePath', filePath.split('.')[0] + 'ReworldLauncher.exe')
       item.setSavePath(filePath)
       // 监听下载过程，计算并设置进度条进度
       item.on('updated', () => {
@@ -144,7 +145,7 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
         }
         // 下载完成，让 dock 上的下载目录Q弹一下下
         if (state === 'completed') {
-          console.log('filePath', filePath)
+          console.log('filePath', filePath.split('.')[0])
           if (is.macOS()) {
             app.dock.downloadFinished(filePath)
             extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
@@ -153,26 +154,18 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
               console.log('extractFile-err: ', err)
             })
           } else if (is.windows()) {
-            exec(`start "${filePath}"`, (error, stdout, stderr) => {
-              console.log(error, stdout, stderr)
+            extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
+              shell.openPath(filePath.split('.')[0] + 'ReworldLauncher.exe')
+            }).catch(err => {
+              console.log('extractFile-err: ', err)
             })
+            // exec(`start "${filePath}"`, (error, stdout, stderr) => {
+            //   console.log(error, stdout, stderr)
+            // })
           }
-          // shell启动浏览器
-          // shell.openExternal('http://www.google.com')
-          // ipcRenderer.invoke('app-child', 'name')
-          // shell.openPath(filePath).then(res => {
-          //   console.log('解压完毕')
-          //   event.reply('download-finish', filePath)
-          // })
         }
       })
     })
-
-    // 
-    // win.webContents.session.on('will-download', (event, item, webContents) => {
-    //   const filePath = path.join(app.getPath('downloads'), item.getFilename())
-    //   item.setSavePath(filePath)
-    // })
     win.webContents.downloadURL(fileUrl)
   } catch (error) {
     console.log(error)
@@ -211,11 +204,19 @@ ipcMain.on('extractFile', (event, filePath, desPath) => {
 
 global.launcher = new Launcher()
 console.log(global.launcher)
-// 下载资源
-// function isInstallMac(appName) {
-//   return new Promise((resolve, reject) => {
-//   })
-// }
+// win地址打开
+function openWinUrl(filePath) {
+  return shell.openPath(filePath)
+}
+// Mac打开未知App
+function openMacApp(appName) {
+  return new Promise((resolve, reject) => {
+    exec(`open -a "${appName}.app"`, (error, stdout, stderr) => {
+      if (error !== null) reject()
+      else resolve()
+    })
+  })
+}
 // MacApp是否安装
 function isInstallMac(appName) {
   return new Promise((resolve, reject) => {
@@ -235,7 +236,39 @@ function isInstallMac(appName) {
     })
   })
 }
-
+// 文件下载
+const fs = require('fs')
+const request = require('request')
+function downloadFile(file_url, targetPath, fileName) {
+  fileName = file_url.substring(file_url.lastIndexOf('/') + 1)
+  targetPath = targetPath + '/' + fileName
+  console.log(file_url, targetPath)
+  // Save variable to know progress
+  let received_bytes = 0
+  let total_bytes = 0
+  let req = request({
+    method: 'GET',
+    uri: file_url
+  })
+  let out = fs.createWriteStream(targetPath)
+  req.pipe(out)
+  req.on('response', function (data) {
+    // Change the total bytes value to get progress later.
+    total_bytes = parseInt(data.headers['content-length'])
+  })
+  req.on('data', function (chunk) {
+    // Update the received bytes
+    received_bytes += chunk.length
+    showProgress(received_bytes, total_bytes)
+  })
+  req.on('end', function () {
+    console.log('File succesfully downloaded')
+  })
+}
+function showProgress(received, total) {
+  var percentage = (received * 100) / total
+  console.log(percentage + '% | ' + received + ' bytes out of ' + total + ' bytes.')
+}
 const { restartApp } = require('@/main/cmd/start.js')
 ipcMain.on('restartApp', (event, appName) => {
   console.log('restartApp')
