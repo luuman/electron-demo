@@ -181,21 +181,19 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
 ipcMain.on('zip-open', (event, fileUrl, fileName) => {
   if (is.macOS()) {
     let filePath = path.join(app.getPath('downloads'), 'downloads') + fileUrl
-    // console.log(filePath, fileUrl, fileName)
-    // fs.createReadStream('filePath')
-    // fs.createReadStream('filePath').pipe(unzipper.Extract({ path: path.join(app.getPath('downloads')) }))
     extract(filePath, {
       dir: path.join(app.getPath('downloads'), 'downloads'),
       onEntry: (item, index) => {
         console.log('onEntryitem', item.fileName)
-        item.fileName = item.fileName.replace('╓╪╞⌠╩└╜τ', '重启世界')
       }
     }).then(res => {
-      console.log('resdfdf', res)
       openMacApp(fileName)
     }).catch(err => {
       console.log('extractFile-err: ', err)
     })
+    // console.log(filePath, fileUrl, fileName)
+    // fs.createReadStream('filePath')
+    // fs.createReadStream('filePath').pipe(unzipper.Extract({ path: path.join(app.getPath('downloads')) }))
   } else if (is.windows()) {
     let filePath = path.join(app.getPath('downloads'), 'downloads') + '/' + fileUrl
     let openPaths = filePath.split('.')[0] + '/' + '重启世界.exe'
@@ -208,7 +206,6 @@ ipcMain.on('zip-open', (event, fileUrl, fileName) => {
         item.fileName = item.fileName.replace('╓╪╞⌠╩└╜τ', '重启世界')
       }
     }).then(res => {
-      console.log('resdfdf', res)
       shell.openPath(openPaths)
       console.timeEnd()
     }).catch(err => {
