@@ -24,7 +24,7 @@ if (!gotSingleLock) {
 } else {
 }
 // app.setAsDefaultProtocolClient('myapp', )
-function createWindow () {
+function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     // width: 1050,
@@ -175,11 +175,23 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
     console.log(error)
   }
 })
+// const unzip = require('unzip')
+// console.log('unzip', unzip)
+
 ipcMain.on('zip-open', (event, fileUrl, fileName) => {
   if (is.macOS()) {
     let filePath = path.join(app.getPath('downloads'), 'downloads') + fileUrl
-    console.log(filePath, fileUrl, fileName)
-    extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
+    // console.log(filePath, fileUrl, fileName)
+    // fs.createReadStream('filePath')
+    // fs.createReadStream('filePath').pipe(unzipper.Extract({ path: path.join(app.getPath('downloads')) }))
+    extract(filePath, {
+      dir: path.join(app.getPath('downloads'), 'downloads'),
+      onEntry: (item, index) => {
+        console.log('onEntryitem', item.fileName)
+        item.fileName = item.fileName.replace('ΘçìσÉ»Σ╕ûτòî', '重启世界')
+      }
+    }).then(res => {
+      console.log('resdfdf', res)
       openMacApp(fileName)
     }).catch(err => {
       console.log('extractFile-err: ', err)
@@ -196,7 +208,6 @@ ipcMain.on('zip-open', (event, fileUrl, fileName) => {
       console.log('extractFile-err: ', err)
     })
   }
-  
 })
 const { spawn, exec } = require('child_process')
 // 打开应用
@@ -232,15 +243,18 @@ ipcMain.on('extractFile', (event, filePath, desPath) => {
 global.launcher = new Launcher()
 console.log(global.launcher)
 // win地址打开
-function openWinUrl(filePath) {
-  return shell.openPath(filePath)
-}
+// function openWinUrl(filePath) {
+//   return shell.openPath(filePath)
+// }
 // Mac打开未知App
 function openMacApp(appName) {
   return new Promise((resolve, reject) => {
     exec(`open -a "${appName}.app"`, (error, stdout, stderr) => {
-      if (error !== null) reject()
-      else resolve()
+      if (error !== null) {
+        reject()
+      } else {
+        resolve()
+      }
     })
   })
 }
