@@ -159,15 +159,15 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
               console.log('extractFile-err: ', err)
             })
           } else if (is.windows()) {
-            let filePath = path.join(app.getPath('downloads'), 'downloads') + '/' + fileUrl
+            // let filePath = path.join(app.getPath('downloads'), 'downloads') + '/' + fileUrl
             let openPaths = filePath.split('.')[0] + '/' + '重启世界.exe'
             console.time()
             extract(filePath, {
               dir: path.join(app.getPath('downloads'), 'downloads'),
               onEntry: (item, index) => {
                 // item.fileName = item.fileName.replace('╓╪╞⌠╩└╜τ', '重启世界')
-                console.log('onEntryitem', iconv.decode(iconv.encode(item.fileName, 'CP936'), 'utf-8'))
-                item.fileName = iconv.decode(iconv.encode(item.fileName, 'CP437'), 'CP936')
+                console.log('onEntryitem', iconv.decode(iconv.encode(item.fileName, 'UTF-8'), 'utf-8'))
+                item.fileName = iconv.decode(iconv.encode(item.fileName, 'CP437'), 'UTF-8')
               }
             }).then(res => {
               shell.openPath(openPaths)
@@ -213,8 +213,8 @@ ipcMain.on('zip-open', (event, fileUrl, fileName) => {
       dir: path.join(app.getPath('downloads'), 'downloads'),
       onEntry: (item, index) => {
         // item.fileName = item.fileName.replace('╓╪╞⌠╩└╜τ', '重启世界')
-        console.log('onEntryitem', iconv.decode(iconv.encode(item.fileName, 'CP936'), 'utf-8'))
-        item.fileName = iconv.decode(iconv.encode(item.fileName, 'CP437'), 'CP936')
+        console.log('onEntryitem', iconv.decode(iconv.encode(item.fileName, 'CP437'), 'CP936'))
+        item.fileName = iconv.decode(iconv.encode(item.fileName, 'CP437'), 'UTF-8')
       }
     }).then(res => {
       shell.openPath(openPaths)
