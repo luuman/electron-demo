@@ -133,6 +133,7 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
           fileBase = baifenb
           if (win) win.setProgressBar(baifenb)
           if (win) event.reply('download-reply', baifenb, baifenb)
+          console.log(new Date(), baifenb)
         }
       })
       // 监听下载结束事件
@@ -148,6 +149,7 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
         }
         // 下载完成，让 dock 上的下载目录Q弹一下下
         if (state === 'completed') {
+          console.log(new Date())
           console.log('filePath', filePath.split('.')[0])
           if (is.macOS()) {
             app.dock.downloadFinished(filePath)
@@ -157,15 +159,22 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
               console.log('extractFile-err: ', err)
             })
           } else if (is.windows()) {
-            // extract(filePath, { dir: path.join(app.getPath('downloads'), 'downloads') }).then(res => {
-            //   shell.openPath(openPaths)
-            // }).catch(err => {
-            //   console.log('extractFile-err: ', err)
-            // })
-            shell.openPath(filePath)
-            // exec(`start "${filePath}"`, (error, stdout, stderr) => {
-            //   console.log(error, stdout, stderr)
-            // })
+            let filePath = path.join(app.getPath('downloads'), 'downloads') + '/' + fileUrl
+            let openPaths = filePath.split('.')[0] + '/' + '重启世界.exe'
+            console.time()
+            extract(filePath, {
+              dir: path.join(app.getPath('downloads'), 'downloads'),
+              onEntry: (item, index) => {
+                // item.fileName = item.fileName.replace('╓╪╞⌠╩└╜τ', '重启世界')
+                console.log('onEntryitem', iconv.decode(iconv.encode(item.fileName, 'CP936'), 'utf-8'))
+                item.fileName = iconv.decode(iconv.encode(item.fileName, 'CP437'), 'CP936')
+              }
+            }).then(res => {
+              shell.openPath(openPaths)
+              console.timeEnd()
+            }).catch(err => {
+              console.log('extractFile-err: ', err)
+            })
           }
         }
       })
@@ -203,8 +212,9 @@ ipcMain.on('zip-open', (event, fileUrl, fileName) => {
     extract(filePath, {
       dir: path.join(app.getPath('downloads'), 'downloads'),
       onEntry: (item, index) => {
-        console.log('onEntryitem', item.fileName)
-        item.fileName = item.fileName.replace('╓╪╞⌠╩└╜τ', '重启世界')
+        // item.fileName = item.fileName.replace('╓╪╞⌠╩└╜τ', '重启世界')
+        console.log('onEntryitem', iconv.decode(iconv.encode(item.fileName, 'CP936'), 'utf-8'))
+        item.fileName = iconv.decode(iconv.encode(item.fileName, 'CP437'), 'CP936')
       }
     }).then(res => {
       shell.openPath(openPaths)
