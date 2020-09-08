@@ -114,6 +114,28 @@ ipcMain.handle('synchronous-message', (event, name) => {
 ipcMain.on('downloads', (event, fileUrl, desPath) => {
   downloadFile(fileUrl, desPath)
 })
+function getSpeedWith(fileSize, timeOut) {
+  console.log('timeOut', timeOut)
+  let num = fileSize / 1024 / timeOut * 1000
+  return parseFloat((num).toFixed(0))
+}
+function SpeedFile(num) {
+  return num < 990 ? parseFloat((num).toFixed(0)) + 'KB/S' : parseFloat((num / 1024).toFixed(2)) + 'MB/S'
+}
+function getDownloadTime(fileSize, speed) {
+  let result = fileSize / speed / 1000
+  var h = Math.floor(result / 3600 % 24)
+  var m = Math.floor(result / 60 % 60)
+  if (h < 1) {
+    return result = m + '分钟'
+  } else {
+    return result = h + '小时' + m + '分钟'
+  }
+}
+// class toDownload {
+//   constructor{}
+//   getSpeedWith
+// }
 ipcMain.on('download', (event, fileUrl, desPath) => {
   try {
     console.log('download fly')
@@ -124,15 +146,22 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
       // 设置文件的保存路径，此时默认弹出的 save dialog 将被覆盖
       const filePath = path.join(path.join(app.getPath('downloads'), 'downloads'), item.getFilename())
       let openPaths = filePath.split('.')[0] + '/' + 'ReworldLauncher.exe'
-      console.log('filePath', openPaths)
+      let oldSize = 0
+      let lastTime = new Date()
       item.setSavePath(filePath)
       // 监听下载过程，计算并设置进度条进度
       item.on('updated', () => {
-        let baifenb = item.getReceivedBytes() / totalBytes
+        let downSize = item.getReceivedBytes()
+        let baifenb = downSize / totalBytes
+        let timeOut = new Date()
+        let speed = getSpeedWith(downSize - oldSize, timeOut - lastTime)
+        let downloadTime = getDownloadTime(totalBytes - downSize, speed)
+        oldSize = downSize
+        lastTime = timeOut
         if (fileBase !== baifenb) {
           fileBase = baifenb
           if (win) win.setProgressBar(baifenb)
-          if (win) event.reply('download-reply', baifenb, baifenb)
+          if (win) event.reply('download-reply', baifenb, SpeedFile(speed), downloadTime)
           console.log(new Date(), baifenb)
         }
       })

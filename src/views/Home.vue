@@ -1,6 +1,7 @@
 <template>
   <div class="home">
-    <div>下载进度：{{ parseFloat((arg * 100).toFixed(2)) || 0 }}%</div>
+    <div>下载进度：{{ parseFloat((arg * 100).toFixed(2)) || 0 }}% 下载速度：{{speed}}</div>
+    <div>下载时间：{{downloadTime}}</div>
     <proBar :numBase="arg"></proBar>
     <div class="content">
       <div class="box" :class="{'disabled': downIs}">
@@ -50,6 +51,8 @@ export default {
     return {
       zip: ['DecompressZip', 'unzip', 'AdmZip', 'StreamZip', 'compressing', 'extractFile'],
       arg: 0,
+      speed: 0,
+      downloadTime: 0,
       downIs: false,
       appIsShow: '',
       appIsDone: '',
@@ -127,8 +130,10 @@ export default {
     download (keys) {
       this.downIs = true
       ipcRenderer.send('download', this.apiCon[keys], '/Users/luuman/Downloads')
-      ipcRenderer.on('download-reply', (event, arg) => {
+      ipcRenderer.on('download-reply', (event, arg, speed, downloadTime) => {
         this.arg = arg
+        this.speed = speed
+        this.downloadTime = downloadTime
       })
       ipcRenderer.on('download-finish', (event, filePath) => {
         this.appIs()
