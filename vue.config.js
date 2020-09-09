@@ -26,28 +26,28 @@ module.exports = {
         // win相关配置
         win: {
           // 图标，当前图标在根目录下，注意这里有两个坑
-          icon: './app.ico',
+          icon: './icon/icons/icon.ico',
           // 利用nsis制作安装程序
           target: ['zip', 'nsis']
         },
         nsis: {
           // 是否一键安装
           oneClick: false,
-          // 允许请求提升。 如果为false，则用户必须使用提升的权限重新启动安装程序。
+        //   // 允许请求提升。 如果为false，则用户必须使用提升的权限重新启动安装程序。
           allowElevation: true,
-          // 允许修改安装目录
+        //   // 允许修改安装目录
           allowToChangeInstallationDirectory: true,
-          // 安装图标
+        //   // 安装图标
           installerIcon: './icon/icons/icon.ico',
-          // 卸载图标
-          uninstallerIcon: './icon/icons/icon.ico',
-          // 安装时头部图标
+        //   // 卸载图标
+          uninstallerIcon: './icon/icons/uninstall.ico',
+        //   // 安装时头部图标
           installerHeaderIcon: './icon/icons/icon.ico',
-          // 创建桌面图标
+        //   // 创建桌面图标
           createDesktopShortcut: true,
-          // 创建开始菜单图标
+        //   // 创建开始菜单图标
           createStartMenuShortcut: true,
-          license: './LICENSE.txt'
+        //   license: './LICENSE.txt'
         }
       }
     }
