@@ -1,0 +1,351 @@
+<html lang="en" class="no-touch">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" type="image/png"
+    href="https://static.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png">
+  <meta name="apple-mobile-web-app-title" content="CodePen">
+  <link rel="shortcut icon" type="image/x-icon"
+    href="https://static.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico">
+  <link rel="mask-icon" type=""
+    href="https://static.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg"
+    color="#111">
+  <title>CodePen - Adventure Interactive Time in 2.75D</title>
+  <style>
+    body,
+    html {
+      background-color: #ddd;
+      margin: 0px;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #bodymovin {
+      background-color: #000;
+      width: 100%;
+      height: 100%;
+      display: block;
+      transform: translate3d(0, 0, 0);
+      margin: auto;
+    }
+  </style>
+  <script>
+    window.console = window.console || function (t) { };
+  </script>
+  <script>
+    if (document.location.search.match(/type=embed/gi)) {
+      window.parent.postMessage("resize", "*");
+    }
+  </script>
+  <style type="text/css">
+    /*
+ * contextMenu.js v 1.4.0
+ * Author: Sudhanshu Yadav
+ * s-yadav.github.com
+ * Copyright (c) 2013 Sudhanshu Yadav.
+ * Dual licensed under the MIT and GPL licenses
+**/
+
+    .iw-contextMenu {
+      box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.10) !important;
+      border: 1px solid #c8c7cc !important;
+      border-radius: 11px !important;
+      display: none;
+      z-index: 1000000132;
+      max-width: 300px !important;
+      width: auto !important;
+    }
+
+    .dark-mode .iw-contextMenu,
+    .TnITTtw-dark-mode.iw-contextMenu,
+    .TnITTtw-dark-mode .iw-contextMenu {
+      border-color: #747473 !important;
+    }
+
+    .iw-cm-menu {
+      background: #fff !important;
+      color: #000 !important;
+      margin: 0px !important;
+      padding: 0px !important;
+      overflow: visible !important;
+    }
+
+    .dark-mode .iw-cm-menu,
+    .TnITTtw-dark-mode.iw-cm-menu,
+    .TnITTtw-dark-mode .iw-cm-menu {
+      background: #525251 !important;
+      color: #FFF !important;
+    }
+
+    .iw-curMenu {}
+
+    .iw-cm-menu li {
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, Ubuntu, sans-serif !important;
+      list-style: none !important;
+      padding: 10px !important;
+      padding-right: 20px !important;
+      border-bottom: 1px solid #c8c7cc !important;
+      font-weight: 400 !important;
+      cursor: pointer !important;
+      position: relative !important;
+      font-size: 14px !important;
+      margin: 0 !important;
+      line-height: inherit !important;
+      border-radius: 0 !important;
+      display: block !important;
+    }
+
+    .dark-mode .iw-cm-menu li,
+    .TnITTtw-dark-mode .iw-cm-menu li {
+      border-bottom-color: #747473 !important;
+    }
+
+    .iw-cm-menu li:first-child {
+      border-top-left-radius: 11px !important;
+      border-top-right-radius: 11px !important;
+    }
+
+    .iw-cm-menu li:last-child {
+      border-bottom-left-radius: 11px !important;
+      border-bottom-right-radius: 11px !important;
+      border-bottom: none !important;
+    }
+
+    .iw-mOverlay {
+      position: absolute !important;
+      width: 100% !important;
+      height: 100% !important;
+      top: 0px !important;
+      left: 0px !important;
+      background: #FFF !important;
+      opacity: .5 !important;
+    }
+
+    .iw-contextMenu li.iw-mDisable {
+      opacity: 0.3 !important;
+      cursor: default !important;
+    }
+
+    .iw-mSelected {
+      background-color: #F6F6F6 !important;
+    }
+
+    .dark-mode .iw-mSelected,
+    .TnITTtw-dark-mode .iw-mSelected {
+      background-color: #676766 !important;
+    }
+
+    .iw-cm-arrow-right {
+      width: 0 !important;
+      height: 0 !important;
+      border-top: 5px solid transparent !important;
+      border-bottom: 5px solid transparent !important;
+      border-left: 5px solid #000 !important;
+      position: absolute !important;
+      right: 5px !important;
+      top: 50% !important;
+      margin-top: -5px !important;
+    }
+
+    .dark-mode .iw-cm-arrow-right,
+    .TnITTtw-dark-mode .iw-cm-arrow-right {
+      border-left-color: #FFF !important;
+    }
+
+    .iw-mSelected>.iw-cm-arrow-right {}
+
+    /*context menu css end */
+  </style>
+  <style type="text/css">
+    @-webkit-keyframes load4 {
+
+      0%,
+      100% {
+        box-shadow: 0 -3em 0 0.2em, 2em -2em 0 0em, 3em 0 0 -1em, 2em 2em 0 -1em, 0 3em 0 -1em, -2em 2em 0 -1em, -3em 0 0 -1em, -2em -2em 0 0;
+      }
+
+      12.5% {
+        box-shadow: 0 -3em 0 0, 2em -2em 0 0.2em, 3em 0 0 0, 2em 2em 0 -1em, 0 3em 0 -1em, -2em 2em 0 -1em, -3em 0 0 -1em, -2em -2em 0 -1em;
+      }
+
+      25% {
+        box-shadow: 0 -3em 0 -0.5em, 2em -2em 0 0, 3em 0 0 0.2em, 2em 2em 0 0, 0 3em 0 -1em, -2em 2em 0 -1em, -3em 0 0 -1em, -2em -2em 0 -1em;
+      }
+
+      37.5% {
+        box-shadow: 0 -3em 0 -1em, 2em -2em 0 -1em, 3em 0em 0 0, 2em 2em 0 0.2em, 0 3em 0 0em, -2em 2em 0 -1em, -3em 0em 0 -1em, -2em -2em 0 -1em;
+      }
+
+      50% {
+        box-shadow: 0 -3em 0 -1em, 2em -2em 0 -1em, 3em 0 0 -1em, 2em 2em 0 0em, 0 3em 0 0.2em, -2em 2em 0 0, -3em 0em 0 -1em, -2em -2em 0 -1em;
+      }
+
+      62.5% {
+        box-shadow: 0 -3em 0 -1em, 2em -2em 0 -1em, 3em 0 0 -1em, 2em 2em 0 -1em, 0 3em 0 0, -2em 2em 0 0.2em, -3em 0 0 0, -2em -2em 0 -1em;
+      }
+
+      75% {
+        box-shadow: 0em -3em 0 -1em, 2em -2em 0 -1em, 3em 0em 0 -1em, 2em 2em 0 -1em, 0 3em 0 -1em, -2em 2em 0 0, -3em 0em 0 0.2em, -2em -2em 0 0;
+      }
+
+      87.5% {
+        box-shadow: 0em -3em 0 0, 2em -2em 0 -1em, 3em 0 0 -1em, 2em 2em 0 -1em, 0 3em 0 -1em, -2em 2em 0 0, -3em 0em 0 0, -2em -2em 0 0.2em;
+      }
+    }
+
+    @keyframes load4 {
+
+      0%,
+      100% {
+        box-shadow: 0 -3em 0 0.2em, 2em -2em 0 0em, 3em 0 0 -1em, 2em 2em 0 -1em, 0 3em 0 -1em, -2em 2em 0 -1em, -3em 0 0 -1em, -2em -2em 0 0;
+      }
+
+      12.5% {
+        box-shadow: 0 -3em 0 0, 2em -2em 0 0.2em, 3em 0 0 0, 2em 2em 0 -1em, 0 3em 0 -1em, -2em 2em 0 -1em, -3em 0 0 -1em, -2em -2em 0 -1em;
+      }
+
+      25% {
+        box-shadow: 0 -3em 0 -0.5em, 2em -2em 0 0, 3em 0 0 0.2em, 2em 2em 0 0, 0 3em 0 -1em, -2em 2em 0 -1em, -3em 0 0 -1em, -2em -2em 0 -1em;
+      }
+
+      37.5% {
+        box-shadow: 0 -3em 0 -1em, 2em -2em 0 -1em, 3em 0em 0 0, 2em 2em 0 0.2em, 0 3em 0 0em, -2em 2em 0 -1em, -3em 0em 0 -1em, -2em -2em 0 -1em;
+      }
+
+      50% {
+        box-shadow: 0 -3em 0 -1em, 2em -2em 0 -1em, 3em 0 0 -1em, 2em 2em 0 0em, 0 3em 0 0.2em, -2em 2em 0 0, -3em 0em 0 -1em, -2em -2em 0 -1em;
+      }
+
+      62.5% {
+        box-shadow: 0 -3em 0 -1em, 2em -2em 0 -1em, 3em 0 0 -1em, 2em 2em 0 -1em, 0 3em 0 0, -2em 2em 0 0.2em, -3em 0 0 0, -2em -2em 0 -1em;
+      }
+
+      75% {
+        box-shadow: 0em -3em 0 -1em, 2em -2em 0 -1em, 3em 0em 0 -1em, 2em 2em 0 -1em, 0 3em 0 -1em, -2em 2em 0 0, -3em 0em 0 0.2em, -2em -2em 0 0;
+      }
+
+      87.5% {
+        box-shadow: 0em -3em 0 0, 2em -2em 0 -1em, 3em 0 0 -1em, 2em 2em 0 -1em, 0 3em 0 -1em, -2em 2em 0 0, -3em 0em 0 0, -2em -2em 0 0.2em;
+      }
+    }
+  </style>
+  <style type="text/css">
+    /* This is not a zero-length file! */
+  </style>
+</head>
+
+<body translate="no">
+  <div id="bodymovin">
+  </div>
+  <!-- <script src="https://static.codepen.io/assets/common/stopExecutionOnTimeout-157cd5b220a5c80d4ff8e0e70ac069bffd87a61252088146915e8726e5d9f147.js"></script> -->
+  <script src="https://labs.nearpod.com/bodymovin/demo/adventure_time/bodymovin.min.js"></script>
+  <script src="https://labs.nearpod.com/bodymovin/demo/adventure_time/data.js"></script>
+  <script id="rendered-js">
+    var anim;
+    var elem = document.getElementById('bodymovin');
+    var animationParams = {
+      container: elem,
+      renderer: 'html',
+      loop: true,
+      autoplay: true,
+      rendererSettings: {
+        progressiveLoad: false
+      },
+
+      animationData: animData
+    };
+
+    anim = bodymovin.loadAnimation(animationParams);
+    var lockeds = {
+      2: false,
+      3: false,
+      4: false,
+      5: false
+    };
+
+    var currentLayerNum = -1;
+    var currentPos = [500.5, 400, -2666.667];
+    var mousePos = [500.5, 400, -2666.667];
+
+    function moveCamera() {
+      currentPos[0] = currentPos[0] + (mousePos[0] - currentPos[0]) * 0.25;
+      currentPos[1] = currentPos[1] + (mousePos[1] - currentPos[1]) * 0.25;
+      currentPos[2] = currentPos[2] + (mousePos[2] - currentPos[2]) * 0.25;
+      anim.animationData.layers[0].ks.p.k[0].s[0] = currentPos[0];
+      anim.animationData.layers[0].ks.p.k[0].e[0] = currentPos[0];
+      anim.animationData.layers[0].ks.p.k[0].s[1] = currentPos[1];
+      anim.animationData.layers[0].ks.p.k[0].e[1] = currentPos[1];
+      anim.animationData.layers[0].ks.p.k[0].s[2] = currentPos[2];
+      anim.animationData.layers[0].ks.p.k[0].e[2] = currentPos[2];
+      requestAnimationFrame(moveCamera);
+    }
+
+    anim.addEventListener('DOMLoaded', function () {
+
+      moveCamera();
+
+      window.addEventListener('mousemove', function (ev) {
+
+        mouseCoords.x = ev.clientX || ev.pageX;
+        mouseCoords.y = ev.clientY || ev.pageY;
+        theta = Math.atan2(
+          windowH / 2 - mouseCoords.y,
+          windowW / 2 - mouseCoords.x);
+
+        var layerNum = 0;
+        if (theta <= Math.PI && theta > Math.PI / 2) {
+          layerNum = 2;
+        } else if (theta <= Math.PI / 2 && theta > 0) {
+          layerNum = 3;
+        } else if (theta <= 0 && theta > -Math.PI / 2) {
+          layerNum = 4;
+        } else {
+          layerNum = 5;
+        }
+        if (!lockeds[layerNum] && anim.currentFrame > 50) {
+          lockeds[layerNum] = true;
+          //if(currentLayerNum !== layerNum){
+          currentLayerNum = layerNum;
+          anim.animationData.layers[layerNum].ip = Math.ceil(anim.currentRawFrame);
+          anim.animationData.layers[layerNum].st = Math.ceil(anim.currentRawFrame);
+          //}
+          setTimeout(function () {
+            lockeds[layerNum] = false;
+          }, 6000);
+        }
+        dist = Math.sqrt(Math.pow(mouseCoords.x - windowW / 2, 2) + Math.pow(mouseCoords.y - windowH / 2, 2));
+        mousePos[0] = 500.5 + Math.cos(theta) * dist;
+        mousePos[1] = 400 + Math.sin(theta) * dist;
+      });
+
+      window.addEventListener('mousewheel', function (ev) {
+        //-2666.667
+        mousePos[2] += ev.wheelDelta;
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+      });
+    });
+
+    var windowW, windowH, dist;
+    var mouseCoords = {
+      x: 0,
+      y: 0
+    };
+
+    function calculateSize() {
+      windowW = window.innerWidth;
+      windowH = window.innerHeight;
+    }
+
+    window.addEventListener('resize', function () {
+      calculateSize();
+      anim.resize();
+    });
+    calculateSize();
+//# sourceURL=pen.js
+  </script>
+
+
+</body>
+
+</html>

@@ -1,6 +1,6 @@
 'use strict'
 import Launcher from '@/main/Launcher'
-import { app, protocol, BrowserWindow, ipcMain, dialog, shell } from 'electron'
+import { app, protocol, BrowserWindow, BrowserView, ipcMain, dialog, shell } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import is from 'electron-is'
@@ -18,11 +18,11 @@ protocol.registerSchemesAsPrivileged([
 ])
 console.log(process.env.ELECTRON_NODE_INTEGRATION)
 
-const gotSingleLock = app.requestSingleInstanceLock()
-if (!gotSingleLock) {
-  app.quit()
-} else {
-}
+// const gotSingleLock = app.requestSingleInstanceLock()
+// if (!gotSingleLock) {
+//   app.quit()
+// } else {
+// }
 // app.setAsDefaultProtocolClient('myapp', )
 function createWindow() {
   // Create the browser window.
@@ -31,6 +31,8 @@ function createWindow() {
     // height: 700,
     width: 340,
     height: 720,
+    show: false,
+    // backgroundColor: '#000',
     // frame: false,
     resizable: false,
     webPreferences: {
@@ -39,7 +41,23 @@ function createWindow() {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION
     }
   })
-
+  let view = new BrowserView({})
+  win.setBrowserView(view)
+  view.setBounds({ x: 0, y: 0, width: 800, height: 800})
+  view.webContents.openDevTools()
+  // const url = require('url')
+  // createProtocol('app')
+  // view.loadURL('app://./index.html')
+  // view.webContents.loadURL(url.format({
+  //   pathname: path.join(__dirname, './bundled/loading.html'),
+  //   protocol: 'file:',
+  //   slashes: true
+  // }))
+  view.webContents.loadURL('file://' + __dirname + '/index.html')
+  // view.webContents.loadFile('bodymovin.html')
+  view.webContents.on('dom-ready', () => {
+    win.show()
+  })
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -49,7 +67,10 @@ function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
-
+  win.on('ready-to-show', function () {
+    // 初始化后再显示
+    win.show()
+  })
   win.on('closed', () => {
     win = null
   })
@@ -116,26 +137,54 @@ ipcMain.on('downloads', (event, fileUrl, desPath) => {
 })
 function getSpeedWith(fileSize, timeOut) {
   console.log('timeOut', timeOut)
-  let num = fileSize / 1024 / timeOut * 1000
+  const num = fileSize / 1024 / timeOut * 1000
   return parseFloat((num).toFixed(0))
 }
 function SpeedFile(num) {
   return num < 990 ? parseFloat((num).toFixed(0)) + 'KB/S' : parseFloat((num / 1024).toFixed(2)) + 'MB/S'
 }
 function getDownloadTime(fileSize, speed) {
-  let result = fileSize / speed / 1000
+  const result = fileSize / speed / 1000
   var h = Math.floor(result / 3600 % 24)
   var m = Math.floor(result / 60 % 60)
   if (h < 1) {
-    return result = m + '分钟'
+    return m + '分钟'
   } else {
-    return result = h + '小时' + m + '分钟'
+    return h + '小时' + m + '分钟'
   }
 }
-// class toDownload {
-//   constructor{}
-//   getSpeedWith
-// }
+export default class fileDownload {
+  constructor () {
+    console.log(this)
+    this.time = 1
+    this.init()
+    this.getSpeedWith()
+  }
+  init() {
+    console.log('init')
+  }
+  getSpeedWith (fileSize, timeOut) {
+    console.log('timeOut', timeOut)
+    const num = fileSize / 1024 / timeOut * 1000
+    return parseFloat((num).toFixed(0))
+  }
+  SpeedFile (num) {
+    return num < 990 ? parseFloat((num).toFixed(0)) + 'KB/S' : parseFloat((num / 1024).toFixed(2)) + 'MB/S'
+  }
+  getDownloadTime (fileSize, speed) {
+    let result = fileSize / speed / 1000
+    var h = Math.floor(result / 3600 % 24)
+    var m = Math.floor(result / 60 % 60)
+    if (h < 1) {
+      return result = m + '分钟'
+    } else {
+      return result = h + '小时' + m + '分钟'
+    }
+  }
+}
+const donwloda = new fileDownload()
+console.log(donwloda)
+
 ipcMain.on('download', (event, fileUrl, desPath) => {
   try {
     console.log('download fly')
