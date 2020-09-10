@@ -1,12 +1,29 @@
 const path = require('path')
 module.exports = {
   pluginOptions: {
+    // electronBuilder: {
+    //   builderOptions: {
+    //     files: [
+    //       {
+    //         'filter': ['**/*']
+    //       }
+    //     ],
+    //     asar: false
+    //   },
+    //   mainProcessFile: 'src/main/main.js',
+    //   mainProcessWatch: ['src/main'],
+    //   // [1.0.0-rc.4+] Provide a list of arguments that Electron will be launched with during "electron:serve",
+    //   // which can be accessed from the main process (src/background.js).
+    //   // Note that it is ignored when --debug flag is used with "electron:serve", as you must launch Electron yourself
+    //   mainProcessArgs: []
+    // }
     electronBuilder: {
       nodeIntegration: true,
       chainWebpackMainProcess: config => {
         config.resolve.alias.set('@', path.join(__dirname, 'src'))
       },
       builderOptions: {
+        // customFileProtocol: 'reworld://./',
         appId: 'com.reworld.app',
         // 项目名，也是生成的安装文件名，即aDemo.exe
         productName: 'Reworld',
@@ -15,6 +32,25 @@ module.exports = {
         directories: {
           // 输出文件路径
           // output: './dist'
+        },
+        dmg: {
+          window: {
+            width: 540,
+            height: 380
+          },
+          // contents: [
+          //   {
+          //     x: 410,
+          //     y: 150,
+          //     type: 'link',
+          //     path: '/Applications'
+          //   },
+          //   {
+          //     x: 130,
+          //     y: 150,
+          //     type: 'file'
+          //   }
+          // ]
         },
         icon: './icon/icons/icon.ico',
         files: ['**/*', 'static/*'],
@@ -46,10 +82,14 @@ module.exports = {
         //   // 创建桌面图标
           createDesktopShortcut: true,
         //   // 创建开始菜单图标
-          createStartMenuShortcut: true,
+          createStartMenuShortcut: true
         //   license: './LICENSE.txt'
         }
-      }
+      },
+      extraFiles: ['./extensions/'],
+      mainProcessFile: 'src/main/index.js',
+      mainProcessWatch: ['src/main'],
+      mainProcessArgs: []
     }
   }
 }

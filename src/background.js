@@ -11,13 +11,11 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
-
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
-console.log(process.env.ELECTRON_NODE_INTEGRATION)
-
+// 重复启动
 // const gotSingleLock = app.requestSingleInstanceLock()
 // if (!gotSingleLock) {
 //   app.quit()
@@ -32,7 +30,7 @@ function createWindow() {
     width: 340,
     height: 720,
     show: false,
-    // backgroundColor: '#000',
+    backgroundColor: '#2a2a2a',
     // frame: false,
     resizable: false,
     webPreferences: {
@@ -41,41 +39,34 @@ function createWindow() {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION
     }
   })
-  let view = new BrowserView({})
+  const view = new BrowserView({})
   win.setBrowserView(view)
-  view.setBounds({ x: 0, y: 0, width: 800, height: 800})
+  view.setBounds({ x: 0, y: 0, width: 200, height: 720 })
   view.webContents.openDevTools()
-  // const url = require('url')
-  // createProtocol('app')
-  // view.loadURL('app://./index.html')
-  // view.webContents.loadURL(url.format({
-  //   pathname: path.join(__dirname, './bundled/loading.html'),
-  //   protocol: 'file:',
-  //   slashes: true
-  // }))
-  view.webContents.loadURL('file://' + __dirname + '/index.html')
-  // view.webContents.loadFile('bodymovin.html')
-  view.webContents.on('dom-ready', () => {
-    win.show()
-  })
+  const url = require('url')
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
+    // view.webContents.loadFile('bodymovin.html')
+    view.webContents.loadURL(process.env.WEBPACK_DEV_SERVER_URL + '/loading.html')
     if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
+    view.webContents.loadURL('app://./loading.html')
     createProtocol('app')
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
-  win.on('ready-to-show', function () {
-    // 初始化后再显示
+  view.webContents.on('dom-ready', () => {
+    console.log('dom-ready', new Date())
     win.show()
+  })
+  ipcMain.on('stop-loading-main', () => {
+    win.removeBrowserView(view)
   })
   win.on('closed', () => {
     win = null
   })
 }
-
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
@@ -84,7 +75,6 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
@@ -92,7 +82,6 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -160,17 +149,21 @@ export default class fileDownload {
     this.init()
     this.getSpeedWith()
   }
+
   init() {
     console.log('init')
   }
+
   getSpeedWith (fileSize, timeOut) {
     console.log('timeOut', timeOut)
     const num = fileSize / 1024 / timeOut * 1000
     return parseFloat((num).toFixed(0))
   }
+
   SpeedFile (num) {
     return num < 990 ? parseFloat((num).toFixed(0)) + 'KB/S' : parseFloat((num / 1024).toFixed(2)) + 'MB/S'
   }
+
   getDownloadTime (fileSize, speed) {
     let result = fileSize / speed / 1000
     var h = Math.floor(result / 3600 % 24)
@@ -194,17 +187,17 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
       let fileBase = 0
       // 设置文件的保存路径，此时默认弹出的 save dialog 将被覆盖
       const filePath = path.join(path.join(app.getPath('downloads'), 'downloads'), item.getFilename())
-      let openPaths = filePath.split('.')[0] + '/' + 'ReworldLauncher.exe'
+      const openPaths = filePath.split('.')[0] + '/' + 'ReworldLauncher.exe'
       let oldSize = 0
       let lastTime = new Date()
       item.setSavePath(filePath)
       // 监听下载过程，计算并设置进度条进度
       item.on('updated', () => {
-        let downSize = item.getReceivedBytes()
-        let baifenb = downSize / totalBytes
-        let timeOut = new Date()
-        let speed = getSpeedWith(downSize - oldSize, timeOut - lastTime)
-        let downloadTime = getDownloadTime(totalBytes - downSize, speed)
+        const downSize = item.getReceivedBytes()
+        const baifenb = downSize / totalBytes
+        const timeOut = new Date()
+        const speed = getSpeedWith(downSize - oldSize, timeOut - lastTime)
+        const downloadTime = getDownloadTime(totalBytes - downSize, speed)
         oldSize = downSize
         lastTime = timeOut
         if (fileBase !== baifenb) {
@@ -238,7 +231,7 @@ ipcMain.on('download', (event, fileUrl, desPath) => {
             })
           } else if (is.windows()) {
             // let filePath = path.join(app.getPath('downloads'), 'downloads') + '/' + fileUrl
-            let openPaths = filePath.split('.')[0] + '/' + '重启世界.exe'
+            const openPaths = filePath.split('.')[0] + '/' + '重启世界.exe'
             console.time()
             extract(filePath, {
               dir: path.join(app.getPath('downloads'), 'downloads'),
@@ -266,7 +259,7 @@ var iconv = require('iconv-lite')
 
 ipcMain.on('zip-open', (event, fileUrl, fileName) => {
   if (is.macOS()) {
-    let filePath = path.join(app.getPath('downloads'), 'downloads') + fileUrl
+    const filePath = path.join(app.getPath('downloads'), 'downloads') + fileUrl
     extract(filePath, {
       dir: path.join(app.getPath('downloads'), 'downloads'),
       onEntry: (item, index) => {
@@ -283,8 +276,8 @@ ipcMain.on('zip-open', (event, fileUrl, fileName) => {
     // fs.createReadStream('filePath')
     // fs.createReadStream('filePath').pipe(unzipper.Extract({ path: path.join(app.getPath('downloads')) }))
   } else if (is.windows()) {
-    let filePath = path.join(app.getPath('downloads'), 'downloads') + '/' + fileUrl
-    let openPaths = filePath.split('.')[0] + '/' + '重启世界.exe'
+    const filePath = path.join(app.getPath('downloads'), 'downloads') + '/' + fileUrl
+    const openPaths = filePath.split('.')[0] + '/' + '重启世界.exe'
     console.log(filePath, fileUrl, fileName)
     console.time()
     extract(filePath, {
@@ -380,11 +373,11 @@ function downloadFile(file_url, targetPath, fileName) {
   // Save variable to know progress
   let received_bytes = 0
   let total_bytes = 0
-  let req = request({
+  const req = request({
     method: 'GET',
     uri: file_url
   })
-  let out = fs.createWriteStream(targetPath)
+  const out = fs.createWriteStream(targetPath)
   req.pipe(out)
   req.on('response', function (data) {
     // Change the total bytes value to get progress later.

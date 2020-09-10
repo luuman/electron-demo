@@ -45,6 +45,7 @@ export default class Launcher extends EventEmitter {
       callback && callback()
     }
   }
+
   init () {
     // this.exceptionHandler = new ExceptionHandler()
 
@@ -60,6 +61,7 @@ export default class Launcher extends EventEmitter {
 
     // this.handleAppEvents()
   }
+
   handleAppEvents () {
     this.handleOpenUrl()
     this.handleOpenFile()
@@ -67,6 +69,7 @@ export default class Launcher extends EventEmitter {
     this.handelAppReady()
     this.handleAppWillQuit()
   }
+
   /**
    * handleOpenUrl
    * Event 'open-url' macOS only
@@ -84,6 +87,7 @@ export default class Launcher extends EventEmitter {
     //   this.sendUrlToApplication()
     // })
   }
+
   /**
    * handleOpenFile
    * Event 'open-file' macOS only
@@ -100,6 +104,7 @@ export default class Launcher extends EventEmitter {
     //   this.sendFileToApplication()
     // })
   }
+
   /**
    * handleAppLaunchArgv
    * For Windows, Linux
@@ -126,18 +131,21 @@ export default class Launcher extends EventEmitter {
     //   this.sendUrlToApplication()
     // }
   }
+
   sendUrlToApplication () {
     // if (this.url && global.application && global.application.isReady) {
     //   global.application.handleProtocol(this.url)
     //   this.url = EMPTY_STRING
     // }
   }
+
   sendFileToApplication () {
     // if (this.file && global.application && global.application.isReady) {
     //   global.application.handleFile(this.file)
     //   this.file = EMPTY_STRING
     // }
   }
+
   handelAppReady () {
     // app.on('ready', () => {
     //   global.application = new Application()
@@ -157,6 +165,7 @@ export default class Launcher extends EventEmitter {
     //   }
     // })
   }
+
   handleAppWillQuit () {
     // app.on('will-quit', () => {
     //   logger.info('[Motrix] will-quit')

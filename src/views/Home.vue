@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div>下载进度：{{ parseFloat((arg * 100).toFixed(2)) || 0 }}% 下载速度：{{speed}}</div>
-    <div>下载时间：{{downloadTime}}</div>
+    <div>{{downloadTime}}</div>
     <proBar :numBase="arg"></proBar>
     <div class="content">
       <div class="box" :class="{'disabled': downIs}">
@@ -83,6 +83,7 @@ export default {
   },
   mounted () {
     this.appIs()
+    ipcRenderer.send('stop-loading-main')
   },
   methods: {
     restartApp () {
@@ -142,7 +143,7 @@ export default {
   }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
   body{
     background: #2a2a2a url("../assets/image/bg.png") 0 0 repeat;
     color: #fff;
