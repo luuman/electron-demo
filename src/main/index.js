@@ -1,6 +1,7 @@
 'use strict'
 import Launcher from '@/main/Launcher'
-import { app, protocol, BrowserWindow, BrowserView, ipcMain, dialog, shell } from 'electron'
+// import fileDownloads from '@/main/download'
+import { app, protocol, BrowserWindow, BrowserView, ipcMain, dialog, globalShortcut, shell } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 import is from 'electron-is'
@@ -32,9 +33,9 @@ function createWindow() {
     show: false,
     // backgroundColor: '#101a2a',
     transparent: true,
-    // titleBarStyle: 'hidden',
+    titleBarStyle: 'hiddenInset',
     frame: false,
-    resizable: false,
+    // resizable: false,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -44,8 +45,7 @@ function createWindow() {
   const view = new BrowserView({})
   win.setBrowserView(view)
   view.setBounds({ x: 0, y: 0, width: 1050, height: 700 })
-  view.webContents.openDevTools()
-  const url = require('url')
+  // view.webContents.openDevTools()
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -97,6 +97,10 @@ app.on('ready', async () => {
     }
   }
   createWindow()
+  // 禁用刷新
+  globalShortcut.register('CommandOrControl+R', () => {
+    return false
+  })
   // openFile()
 })
 
@@ -124,7 +128,7 @@ ipcMain.handle('synchronous-message', (event, name) => {
 })
 // 启动下载
 ipcMain.on('downloads', (event, fileUrl, desPath) => {
-  downloadFile(fileUrl, desPath)
+  fileDownloads(fileUrl, desPath)
 })
 function getSpeedWith(fileSize, timeOut) {
   console.log('timeOut', timeOut)

@@ -39,6 +39,7 @@
 // @ is an alias to /src
 // import HelloWorld from '@/components/HelloWorld.vue'
 import { ipcRenderer } from 'electron'
+import FileDownloads from '@/main/download'
 // import bodymovin from 'bodymovin'
 // const animationData = require('../../static/planets-spinning.json')
 import proBar from '@/components/ui/progress-bar'
@@ -78,16 +79,21 @@ export default {
           name: '重启世界'
         }
       },
+      donw: '',
       filePath: ''
     }
   },
   mounted () {
     this.appIs()
     ipcRenderer.send('stop-loading-main')
+    this.donw = new FileDownloads({
+      fileUrl: 'https://github.com/luuman/Index/releases/download/world/ReworldLauncher.zip'
+    })
   },
   methods: {
     restartApp () {
-      ipcRenderer.send('restartApp', this.apiCon.downName)
+      console.log(this.donw.get())
+      // ipcRenderer.send('restartApp', this.apiCon.downName)
     },
     // app是否安装
     appIs () {

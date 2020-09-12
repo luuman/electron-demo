@@ -1,5 +1,6 @@
 <template>
   <div class="main" id="app">
+    <!-- <div class="top-titlebar"></div> -->
     <div class="con">
       <div class="menu" style="-webkit-app-region: drag">menu</div>
       <div class="boxs">
@@ -29,7 +30,16 @@ export default {
     const remote = window.remote
     console.log(electron)
     console.log(remote)
-
+    window.onbeforeunload = function() {
+      var n = window.event.screenX - window.screenLeft
+      var b = n > document.documentElement.scrollWidth - 20
+      if ((b && window.event.clientY < 0) || window.event.altKey) {
+        alert('这是一个关闭操作而非刷新')
+        window.event.returnValue = ''
+      } else {
+        alert('这是一个刷新操作而非关闭')
+      }
+  }
     // const { dialog } = window.remote
     // dialog.showErrorBox('title', 'con')
   },
@@ -38,6 +48,16 @@ export default {
 }
 </script>
 <style lang="scss">
+  .top-titlebar {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 32px;
+    background-color: #7a7c7c;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+  }
   html, body, #app{
     margin: 0;
     padding: 0;
