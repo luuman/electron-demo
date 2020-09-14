@@ -3,10 +3,10 @@ const request = require('request')
 
 export default class FileDownloads {
   constructor(argement) {
-    const { fileUrl } = argement
-    // console.log(this)
+    const { fileUrl, format = 'hh:mm:ss' } = argement
     // 文件名称
     this.fileName = this.getName(fileUrl)
+    this.format = format
     this.targetPath = this.getTargetPath(this.fileName)
     // 剩余时间
     this.timeOut = ''
@@ -17,7 +17,6 @@ export default class FileDownloads {
     // 文件大小
     this.totalBytes = 0
     this.init(fileUrl)
-    // this.getSpeedWith()
   }
 
   init(fileUrl) {
@@ -34,14 +33,15 @@ export default class FileDownloads {
     req.on('data', function (chunk) {
       // 更新下载进度
       const timeOut = new Date()
-      self.receivedBytes += chunk.length
-      self.showProgress(self.receivedBytes, self.totalBytes)
-      if (timeOut - lastTime) self.timeOut = self.getDownloadTime(self.totalBytes - self.receivedBytes, self.getSpeedWith(self.receivedBytes - oldSize, timeOut - lastTime))
-      oldSize = self.receivedBytes
-      lastTime = timeOut
+      if (chunk.length > 0) {
+        self.receivedBytes += chunk.length
+        if (timeOut - lastTime) self.timeOut = self.setDownloadTime(self.totalBytes - self.receivedBytes, self.getSpeedWith(self.receivedBytes - oldSize, timeOut - lastTime))
+        oldSize = self.receivedBytes
+        lastTime = timeOut
+      }
     })
     req.on('end', function () {
-      // console.log('File succesfully downloaded')
+      console.log('File succesfully downloaded')
     })
   }
 
@@ -53,31 +53,26 @@ export default class FileDownloads {
     return fileUrl.substring(fileUrl.lastIndexOf('/') + 1)
   }
 
-  showProgress() { }
-
-  get() {
-    const { timeOut, speed, receivedBytes, totalBytes } = this
-    console.log(this.speed)
-    return {
-      // fileName: fileName,
-      // targetPath: targetPath,
-      timeOut: timeOut,
-      speed: this.SpeedFile(speed),
-      schedule: this.getSchedule(receivedBytes, totalBytes),
-      receivedBytes: this.renderSize(receivedBytes),
-      totalBytes: this.renderSize(totalBytes)
-    }
-  }
-
   getSpeedWith(fileSize, timeOut) {
     const num = fileSize / 1024 / timeOut * 1000
     if (num === 'Infinity') console.log('fileSize', fileSize)
     this.speed = num
-    // console.log(this.speed, fileSize, timeOut)
     return num
   }
 
-  renderSize(value) {
+  setSchedule(receivedBytes, totalBytes) {
+    return parseFloat((receivedBytes / totalBytes).toFixed(4))
+  }
+
+  setSpeed(num) {
+    if (num) return num < 990 ? parseFloat((num).toFixed(0)) + 'KB/S' : parseFloat((num / 1024).toFixed(2)) + 'MB/S'
+  }
+
+  setDownloadTime(fileSize, speed) {
+    return fileSize / speed / 1000
+  }
+
+  setSize(value) {
     if (value === null || value === '') {
       return '0 Bytes'
     }
@@ -90,24 +85,43 @@ export default class FileDownloads {
     return size + unitArr[index]
   }
 
-  getSchedule(receivedBytes, totalBytes) {
-    return parseFloat((receivedBytes / totalBytes).toFixed(4))
+  setDate() {
+    const time = this.timeOut
+    let format = this.format
+    var o = {
+      // 月份
+      M: Math.floor(time / 3600 / 24 / 30 % 100),
+      // 日
+      d: Math.floor(time / 3600 / 24 % 30),
+      // 小时
+      h: Math.floor(time / 3600 % 24),
+      // 分
+      m: Math.floor(time / 60 % 60),
+      // 秒
+      s: Math.floor(time % 60),
+      // 毫秒
+      S: Math.floor(time * 1000 % 1000)
+    }
+    if (/(y+)/.test(format)) format = format.replace(RegExp.$1, ('this.getFullYear()' + '').substr(4 - RegExp.$1.length))
+    for (var k in o) {
+      if (new RegExp('(' + k + '+' + ')').test(format)) {
+        format = format.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)))
+      }
+    }
+    return format
   }
 
-  SpeedFile(num) {
-    if (num) return num < 990 ? parseFloat((num).toFixed(0)) + 'KB/S' : parseFloat((num / 1024).toFixed(2)) + 'MB/S'
-  }
-
-  getDownloadTime(fileSize, speed) {
-    let result = fileSize / speed / 1000
-    var h = Math.floor(result / 3600 % 24)
-    var m = Math.floor(result / 60 % 60)
-    if (h < 1) {
-      result = m + '分钟'
-      return result
-    } else {
-      result = h + '小时' + m + '分钟'
-      return result
+  get() {
+    const { timeOut, speed, receivedBytes, totalBytes } = this
+    console.log(this.speed)
+    return {
+      // fileName: fileName,
+      // targetPath: targetPath,
+      timeOut: this.setDate(timeOut),
+      speed: this.setSpeed(speed),
+      schedule: this.setSchedule(receivedBytes, totalBytes),
+      receivedBytes: this.setSize(receivedBytes),
+      totalBytes: this.setSize(totalBytes)
     }
   }
 }
