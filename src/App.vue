@@ -2,7 +2,7 @@
   <div class="main" id="app">
     <!-- <div class="top-titlebar"></div> -->
     <div class="con">
-      <div class="menu" style="-webkit-app-region: drag">menu</div>
+      <div class="menu" style="-webkit-app-region: drag">{{ $t('userManagement')}}</div>
       <div class="boxs">
         <div class="header" style="-webkit-app-region: drag">header</div>
         <router-view class="app"/>
@@ -13,6 +13,8 @@
 </template>
 
 <script>
+// import { inject } from 'vue'
+
 import { mapGetters } from 'vuex'
 export default {
   computed: {
@@ -25,7 +27,7 @@ export default {
     }
   },
   mounted () {
-    console.log('linkList', this.token)
+    console.log('linkList', this.$t)
     const electron = window.electron
     const remote = window.remote
     console.log(electron)

@@ -98,9 +98,9 @@ app.on('ready', async () => {
   }
   createWindow()
   // 禁用刷新
-  globalShortcut.register('CommandOrControl+R', () => {
-    return false
-  })
+  // globalShortcut.register('CommandOrControl+R', () => {
+  //   return false
+  // })
   // openFile()
 })
 

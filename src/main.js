@@ -4,12 +4,16 @@ import router from './router'
 import store from './store'
 // import isElectron from 'is-electron'
 import { ipcRenderer } from 'electron'
+// import VueI18Next from '@panter/vue-i18next'
+// import i18n from '@/i18n'
+import i18nPlugin from '@/i18n'
 
+// 本地假数据
 import Mock from './mock/index'
-// console.log(global.launcher)
 if (process.env.NODE_ENV === 'development') {
 	Mock.init()
 }
+// const i18n = new VueI18Next(localeManager.getI18n())
 
 // 不重定向白名单
 const whiteList = ['/login']
@@ -33,6 +37,7 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from, next) => {
   // NProgress.done() // 结束Progress
 })
+
 // 窗口调节
 function reSetSize(name = '') {
 	console.log('reSetSize', name, sizeName, sizeName !== name)
@@ -46,7 +51,21 @@ function reSetSize(name = '') {
 	}
 }
 
-createApp(App).use(store).use(router).mount('#app')
+// const i18nStrings = {
+// 	greetings: {
+// 		hi: 'Hallo!'
+// 	}
+// }
+
+const app = createApp(App)
+app.use(store)
+	.use(router)
+	.use(i18nPlugin)
+	// .use(VueI18n)
+	.mount('#app')
+
+// app.config.globalProperties.$t = i18n
+// app.provide('$t', app.config.globalProperties.$t)
 
 // const { exec } = require('child_process')
 // const os = require('os')
